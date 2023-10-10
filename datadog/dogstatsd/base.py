@@ -24,6 +24,10 @@ except ImportError:
     import Queue as queue  # type: ignore[no-redef]
 
 from typing import Optional, List, Text, Union
+from collections.abc import Callable
+
+from typing import ParamSpec
+from typing import TypeVar
 
 # Datadog libraries
 from datadog.dogstatsd.context import (
@@ -798,7 +802,19 @@ class DogStatsd(object):
         """
         self._report(metric, "ms", value, tags, sample_rate)
 
-    def timed(self, metric=None, tags=None, sample_rate=None, use_ms=None):
+
+    # TODO: Make this compatible with python 2.7 and 3.5
+
+    P = ParamSpec("P")
+    T = TypeVar("T")
+
+    def timed(
+        self,
+        metric: str | None = None,
+        tags: list[str] | None = None,
+        sample_rate: float | None = None,
+        use_ms: bool | None = None,
+    ) -> Callable[[Callable[P, T]], Callable[P, T]]:
         """
         A decorator or context manager that will measure the distribution of a
         function's/context's run time. Optionally specify a list of tags or a
